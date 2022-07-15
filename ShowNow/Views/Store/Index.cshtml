@@ -1,0 +1,45 @@
+﻿@using ShopNowBL.Models
+@model List<tblStore>
+
+    @{
+        ViewBag.Title = "Index";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <h2>Store</h2>
+
+    @Html.ActionLink("Add Store", "AddStore", "Store", new { @class = "btn btn-primary" })
+
+<br /><br />
+    <table class="table table-bordered table-condensed table-hover">
+        <tr>
+            <th>Store ID</th>
+            <th>Store Name</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Contact No</th>
+            <th>Started Date</th>
+            <th>Created By</th>
+            <th>Created Date</th>
+            <th>Update</th>
+            <th>Delete</th>
+
+        </tr>
+
+        @foreach (var item in Model)
+        {
+    <tr>
+        <td>@item.Id</td>
+        <td>@item.StoreName</td>
+        <td>@item.Address</td>
+        <td>@item.City</td>
+        <td>@item.ContactNo</td>
+        <td>@item.StartedDate</td>
+        <td>@item.CreatedBy</td>
+        <td>@item.CreatedDate</td>
+        <td><a href="/Store/Details/@item.Id">Edit</a></td>
+        <td><a href=@Url.Action("Delete","Store",new {id=item.Id})
+                   new { onclick="return confirm('Are you sure want to delete?');">Delete</a></td>
+    </tr>
+        }
+    </table>

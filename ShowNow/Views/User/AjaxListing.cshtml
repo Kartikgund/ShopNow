@@ -1,0 +1,245 @@
+﻿
+@{
+    ViewBag.Title = "AjaxListing";
+}
+
+<h2>Ajax Listing</h2>
+
+<div>
+    <h2>Add Customer</h2>
+    <div class="form-group">
+        <input type="hidden" id="hdnCId" />
+    </div>
+    <div class="form-group">
+        Customer Name <input type="text" id="txtCustomerName" />
+    </div>
+
+    <div class="form-group">
+        Mobile No <input type="text" id="txtMobileNo" />
+    </div>
+
+
+    <div class="form-group">
+        <button type="button" id="btnSubmit" onclick="SaveCustomer();">Save</button>
+    </div>
+
+</div>
+
+<br />
+<br />
+<div>
+    <h2>Add User</h2>
+    <div class="form-group">
+     
+        
+        
+        <input type="hidden" id="hdnUId" />
+    </div>
+
+    <div class="form-group">
+        User Name <input type="text" id="UName" />
+    </div>
+
+    <div class="form-group">
+        Email Id <input type="text" id="Email" />
+    </div>
+
+    <div class="form-group">
+        Mobile No <input type="text" id="MobileNo" />
+    </div>
+
+    <div class="form-group">
+        Password <input type="text" id="password" />
+    </div>
+
+    <div class="form-group">
+        City <input type="text" id="city" />
+    </div>
+
+    <div class="form-group">
+        Store Id <input type="text" id="storeId" />
+    </div>
+
+    <div>
+        <label for="cars">Choose a Role:</label>
+        <select name="RoleId" id="RoleId">
+            <option disabled selected >--select Role--</option>
+            <option value="2">Admin</option>
+            <option value="3">Cashier</option>
+
+        </select>
+    </div>
+
+    <div class="form-group">
+        <button type="button" id="btnSubmit" onclick="SaveUser();">Save</button>
+    </div>
+
+</div>
+
+
+
+<div id="div1">
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        ShowData();
+    });
+
+    function ShowData() {
+        $.ajax({
+            url: '@Url.Action("AjaxPartialListing","User")',
+            success: function (result) {
+                $("#div1").html(result);
+            }
+        });
+    }
+
+    function SaveCustomer() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveCustomerAjax", "Customer")',
+            data: '{Id: ' + JSON.stringify($('#hdnCId').val()) +',CustomerName: ' + JSON.stringify($('#txtCustomerName').val()) + ',MobileNo: ' + JSON.stringify($('#txtMobileNo').val()) + '}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                $('#txtCustomerName').val("");
+                $('#txtMobileNo').val("");
+                alert("data saved successfully");
+                ShowData();
+
+            },
+            error: function (result) {
+
+            }
+        });
+
+
+    }
+
+    function SaveUser() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveUserAjax", "User")',
+            data: '{Id: ' + JSON.stringify($('#hdnUId').val()) +
+                ',UName: ' + JSON.stringify($('#UName').val()) +
+                ',Email: ' + JSON.stringify($('#Email').val()) +
+                ',MobileNo: ' + JSON.stringify($('#MobileNo').val()) +
+                ',password: ' + JSON.stringify($('#password').val()) +
+                ',city: ' + JSON.stringify($('#city').val()) +
+                ',storeId: ' + JSON.stringify($('#storeId').val()) +
+                ',RoleId: ' + JSON.stringify($('#RoleId').val()) +'}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                $('#UName').val("");
+                $('#Email').val("");
+                $('#MobileNo').val("");
+                $('#password').val("");
+                $('#city').val("");
+                $('#storeId').val("");
+                $('#RoleId').val("");
+                alert("data saved successfully");
+                ShowData();
+
+            },
+            error: function (result) {
+
+            }
+        });
+    }
+
+
+    function GetCustomer(id) {
+        alert(id);
+        $("#hdnCId").val(id);
+        $.ajax({
+            type:"POST",
+            url: '@Url.Action("GetCustomerById","Customer")',
+            data: '{Id: ' + JSON.stringify($("#hdnCId").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+            success: function (result) {
+                console.log(result);
+                $('#txtCustomerName').val(result.CustomerName);
+                $('#txtMobileNo').val(result.MobileNo);
+
+                ShowData();
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+    }
+
+    function DeleteCustomer(id) {
+        if (confirm('Are you sure you want to delete this?')) {
+            //alert(id);
+            $("#hdnCId").val(id);
+            $.ajax({
+            type:"POST",
+            url: '@Url.Action("DeleteCustomer","Customer")',
+            data: '{Id: ' + JSON.stringify($("#hdnCId").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+            success: function (result) {
+                console.log(result);
+                alert(id + " deleted successfully");
+                ShowData();
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+        }
+    }
+
+    function GetUser(id) {
+        alert(id);
+        $("#hdnUId").val(id);
+        $.ajax({
+            type:"POST",
+            url: '@Url.Action("GetUserById","User")',
+            data: '{Id: ' + JSON.stringify($("#hdnUId").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+            success: function (result) {
+                console.log(result);
+                $('#UName').val(result.UserName);
+                $('#Email').val(result.EmailId);
+                $('#MobileNo').val(result.MobileNo);
+                $('#password').val(result.Password);
+                $('#city').val(result.City);
+                $('#storeId').val(result.StoreId);
+                $('#RoleId').val(result.RoleId);
+                ShowData();
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+    }
+
+    function DeleteUser(id) {
+        if (confirm('Are you sure you want to delete this?')) {
+            //alert(id);
+            $("#hdnUId").val(id);
+            $.ajax({
+            type:"POST",
+            url: '@Url.Action("DeleteUser","User")',
+            data: '{Id: ' + JSON.stringify($("#hdnUId").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+            success: function (result) {
+                console.log(result);
+                alert(id + " deleted successfully");
+                ShowData();
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+        }
+    }
+</script>

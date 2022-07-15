@@ -1,0 +1,42 @@
+﻿@using ShopNowBL.Models
+@model List<tblCustomer>
+
+@{
+    ViewBag.Title = "Customer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Customer</h2>
+
+@Html.ActionLink("Add Customer", "AddCustomer", "Customer", new { @class = "btn btn-primary" })
+<br />
+<br />
+<table class="table table-bordered table-condensed table-hover"> 
+    <tr>
+        <th>Customer ID</th>
+        <th>Customer Name</th>
+        <th>MobileNo</th>
+        <th>Created By</th>
+        <th>Created Date</th>
+        <th>Update</th>
+        <th>Delete</th>
+
+    </tr>
+
+    @foreach (var customer in Model)
+    {
+<tr>
+    <td>@customer.Id</td>
+    <td>@customer.CustomerName</td>
+    <td>@customer.MobileNo</td>
+    <td>@customer.CreatedBy</td>
+    <td>@customer.CreatedDate</td>
+    <td><a href="/Customer/Details/@customer.Id">Edit</a></td>
+    <td>
+        <a href=@Url.Action("Delete","Customer",new {id=customer.Id})
+           new { onclick="return confirm('Are you sure want to delete?');">Delete</a>
+    </td>
+
+</tr>
+    }
+</table>

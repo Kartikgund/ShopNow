@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("ShopNow", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+
+                    <li>@Html.ActionLink("Admin", "AdminList", "User")</li>
+                    <li>@Html.ActionLink("Cashiers", "AdminLogin", "User")</li>
+                    <li>@Html.ActionLink("Customer", "ListCustomer", "Customer")</li>
+                    <li>@Html.ActionLink("Store", "Index", "Store")</li>
+                    <li>@Html.ActionLink("Stocks", "ListProduct", "Stocks")</li>
+                    <li>@Html.ActionLink("CustomerUser", "AjaxListing", "User")</li>
+                    <li>@Html.ActionLink("Stock&Store", "AjaxStoreListing", "Store")</li>
+                    <li>@Html.ActionLink("AjaxStock", "StockAjaxListing", "Stocks")</li>
+                    <li>@Html.ActionLink("BuyProduct", "BuyProduct", "Stocks")</li>
+                    <li>@Html.ActionLink("Logout", "Logout", "User", null, new { onclick = "return confirm('Are you sure want to Logout?');" }) </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

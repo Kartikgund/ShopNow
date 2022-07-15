@@ -1,0 +1,64 @@
+﻿@model ShowNow.ViewModels.TransactionModel
+
+<h1>Invoice</h1>
+<hr />
+<div>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="name">Invoice No :</label>
+        @Model.objTransaction.InvoiceNo
+
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="name">Invoice Date :</label>
+        @Model.objTransaction.InvoiceDate
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="name">Customer Name :</label>
+        @Model.objCustmore.CustomerName
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="NobileNo">Mobile No  :</label>
+        @Model.objCustmore.MobileNo
+    </div>
+</div>
+<hr />
+<table class="table table-bordered table-condensed table-hover">
+    <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+
+    </tr>
+
+    @foreach (var item in Model.lstItems)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.tblStock.ProductName</td>
+            <td>@item.Qty</td>
+            <td>@item.Price</td>
+        </tr>
+    }
+</table>
+<br />
+<div class="form-group">
+    <label class="control-label col-sm-2" for="NobileNo">Total Discount  :</label>
+    @Model.objTransaction.TotalDiscount
+</div>
+<div class="form-group">
+    <label class="control-label col-sm-2" for="NobileNo">Total GST  :</label>
+    @Model.objTransaction.GST
+</div>
+
+
+<div class="form-group">
+    <label class="control-label col-sm-2" for="NobileNo">Total Amount  :</label>
+    @Model.objTransaction.InvoiceAmount
+</div>
+
+
+@if (string.IsNullOrEmpty(Convert.ToString(ViewBag.Hide)))
+{
+        <a href=@Url.Action("PrintInvoice", "Transaction", new { InvoiceNo = Model.objTransaction.InvoiceNo })>Print</a>
+}

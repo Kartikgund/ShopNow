@@ -1,0 +1,59 @@
+﻿@model ShopNowBL.Models.tblUser
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+
+    @using (Html.BeginForm("AuthenticateUser", "User", FormMethod.Post))
+    {
+        if (!string.IsNullOrEmpty(ViewBag.InvalidUser))
+        {
+            <script>
+                alert("Invalid User Details !!!");
+            </script>
+        }
+<div class="container ">
+
+    <div class="row justify-content-center">
+        <div class="form-group col-md-4 col-md-offset-5 align-center">
+            <h2>Login</h2>
+            
+        </div>
+        @Html.Label("EmailId", "User Id", new { @class = "form-group col-md-4 col-md-offset-5 align-center" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.EmailId, new { htmlAttributes = new { @class = "form-group col-md-4 col-md-offset-5 align-center", placeholder = "example@gmail.com" } })
+
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        @Html.Label("Password", "Password", new { @class = "form-group col-md-4 col-md-offset-5 align-center" })
+        <div class="col-md-10">
+
+            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-group col-md-4 col-md-offset-5 align-center", placeholder = "Password" } })
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-group col-md-4 col-md-offset-5 align-center">
+            <input type="submit" value="Login" class="btn btn-success" />
+        </div>
+    </div>
+</div>
+        }
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>

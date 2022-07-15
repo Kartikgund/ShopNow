@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ShopNowBL.Models.tblUser>
+
+@{
+    ViewBag.Title = "AdminList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Admin List</h2>
+
+<p>
+    @Html.ActionLink("Add Admin", "AddAdmin", "User", new { @class = "btn btn-primary" })
+</p>
+<table class="table table-bordered table-condensed table-hover">
+    <tr>
+        <th>Cashier ID</th>
+        <th>Name</th>
+        <th>Email ID</th>
+        <th>Mobile No</th>
+        <th>City</th>
+        <th>Store ID</th>
+        <th>Created By</th>
+        <th>Created Date</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.UserName</td>
+            <td>@item.EmailId</td>
+            <td>@item.MobileNo</td>
+            <td>@item.City</td>
+            <td>@item.StoreId</td>
+            <td>@item.CreatedBy</td>
+            <td>@item.CreatedDate</td>
+            <td><a href="/User/AdminDetails/@item.Id">Update</a></td>
+            <td>
+                <a href=@Url.Action("DeleteAdmin","User",new {id=item.Id})
+                   new { onclick="return confirm('Are you sure want to delete?');">Delete</a>
+            </td>
+
+        </tr>
+    }
+</table>

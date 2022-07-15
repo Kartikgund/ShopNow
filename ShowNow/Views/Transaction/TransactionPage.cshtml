@@ -1,0 +1,202 @@
+﻿@model ShowNow.ViewModels.TransactionModel
+@{
+    ViewBag.Title = "TransactionPage";
+}
+
+<h2>TransactionPage</h2>
+@using (Html.BeginForm("SaveTransactionViewModel", "Transaction", FormMethod.Post))
+{
+<div class="form-horizontal">
+    <div class="form-group">
+        @Html.Label("ProductName", "Product Name", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Product Name", new SelectList(Model.lstProduct, "Id", "ProductName"), "Please Select",
+    new { @id = "product", @class = "form-control", @onchange = "GetProduct(this.value)" })
+
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.HiddenFor(model => model.objItem.ProductId, new { id = "txtPId" })
+    </div>
+    <div class="form-group">
+        @Html.Label("Qty", " Quantity", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objTransaction.TotalQty, new { type = "number", min = "0" })
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Price", "Amount", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objItem.Price, new { @readonly = "readonly", id = "txtAmount" })
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Discount", "Discount", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objTransaction.TotalDiscount, new { @readonly = "readonly", id = "txtDiscount" })
+
+        </div>
+    </div>
+    
+    <div class="form-group">
+        @Html.Label("GST", "GST", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objTransaction.GST, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Total Amount", "TotalAmount", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objTransaction.InvoiceAmount, new { @readonly = "readonly", id = "txtTotalAmount" })
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("MobileNo", "Mobile No", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objCustmore.MobileNo, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Name", "Customer Name", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objCustmore.CustomerName, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        @Html.HiddenFor(model => model.objCustmore.Id)
+    </div>
+    <div class="form-group">
+        
+        @Html.HiddenFor(model => model.objTransaction.CustomerId, new { id = "hdnCId" })
+    </div>
+
+    <div class="form-group">
+        @Html.Label("InvoiceNo", "Invoice No", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.objItem.InvoiceId, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("PaymentMethod", "Payment Method", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.objTransaction.PaymentMethod, new SelectList(Model.BOProducts(), "Value", "Text"), "Please Select", htmlAttributes: new { @class = "input40", @id = "ddlBOProduct1" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Pay Bill" class="btn btn-success" />
+        </div>
+    </div>
+
+</div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#objTransaction_GST').focusout(function () {
+            calc_total();
+
+        });
+
+        $('#objCustmore_MobileNo').focusout(function () {
+            GetCustomer();
+
+        });
+    });
+
+    function GetProduct(id) {
+        //alert(id);
+        $.ajax({
+            type:"POST",
+            url: '@Url.Action("GetProductById","Transaction")',
+            data: '{Id: ' + JSON.stringify($("#product").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+            success: function (result) {
+                $('#txtAmount').val(result.SellingPrice);
+                $('#txtDiscount').val(result.Discount);
+                $('#txtPId').val(result.Id);
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+    }
+
+    function calc_total() {
+        var BasicAmt = parseFloat($('#txtAmount').val()) * parseFloat($('#objTransaction_TotalQty').val()),
+            discount = BasicAmt * ($('#txtDiscount').val() / 100),
+            gst = (BasicAmt - discount) * ($('#objTransaction_GST').val() / 100),
+            totalAmount = BasicAmt - discount + gst;
+        $('#txtTotalAmount').val(totalAmount);
+    }
+
+    function GetCustomer() {
+
+       $.ajax({
+            type:"POST",
+            url: '@Url.Action("GetCustomerByNumber", "Customer")',
+           data: '{MobileNo: ' + JSON.stringify($("#objCustmore_MobileNo").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+           success: function (result) {
+               $('#objCustmore_Id').val(result.Id);
+               $('#hdnCId').val(result.Id);
+               $('#objCustmore_CustomerName').val(result.CustomerName);
+               alert("Registered Customer")
+             //  document.getElementById("btnSave").style.display = "block";
+
+            },
+           error: function (result) {
+               alert("Not registered.!!");
+              // document.getElementById("myForm").style.display = "block";
+              // openForm();
+
+            }
+        });
+        }
+
+        function feedTable() {
+           // e.preventDefault();
+            if (!this.snNo) this.snNo = 1;
+            var Name = $('#product').val(),
+                Id = $('#txtPId').val(),
+                SPrice = $('#txtAmount').val(),
+                Discount = $('#txtDiscount').val(),
+                Qty = $('#objTransaction_TotalQty').val(),
+               
+                Price = (SPrice * Qty) - (SPrice * Qty * (Discount / 100))
+            $('#record').append(
+                "<tr><td>" + Id + "</td>" +
+                "<td>" + Name + "</td>" +
+                "<td>" + SPrice + "</td>" +
+                "<td>" + Discount + "</td>" +
+                "<td>" + Qty + "</td>" +
+       
+                "<td class='total'>" + Price + "</td></tr > "
+            )
+            this.snNo += 1;
+            calc_total();
+
+            $('#product').val(""),
+                 $('#txtPId').val(""),
+                $('#txtAmount').val(""),
+                 $('#txtDiscount').val(""),
+                 $('#objTransaction_TotalQty').val("")
+           @* var count = $('#record tr').length - 1;
+            console.log(count);*@
+        }
+
+
+</script>

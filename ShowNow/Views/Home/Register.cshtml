@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewBag.Title = "Register";
+}
+
+<h2>Register</h2>
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<body>
+    
+        <!-- Sign Up Start -->
+
+        <div class="container-fluid">
+            <div class="row px-xl-5">
+                <div class="col-md-10">
+                    <h5><b>User Details</b></h5>
+                    <form action="" method="post">
+                        <div class="row">
+                            <div class="form-group col">
+                                <label for="uname">User Name<i style="color: red;">*</i></label>
+                                <input name="uname" id="uname" class="form-control" pattern="[A-Z][a-z]{1,15}" title="First letter should be uppercase another in lowercase" required>
+                            </div>
+                            <div class="form-group col">
+                                <label for="email">Email<i style="color: red;">*</i></label>
+                                <input name="email" type="email" id="email" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col">
+                                <label for="mobno">Mobile No <i style="color: red;">*</i></label>
+                                <input name="mobileno" id="mobno" class="form-control" required pattern="[0-9]{10}" title="Enter ten digit no">
+                            </div>
+                            <div class="form-group col">
+                                <label for="password">Password<i style="color: red;">*</i></label>
+                                <input name="password" type="password" id="password" class="form-control" minlength="8" maxlength="15" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col">
+                                <label for="city">City <i style="color: red;">*</i></label>
+                                <input name="city" id="city" class="form-control" required>
+                            </div>
+                            <div class="form-group col">
+                                <label for="storeid">Store ID<i style="color: red;">*</i></label>
+                                <input name="storeid" id="storeid" class="form-control" minlength="8" maxlength="15" required>
+                            </div>
+                        </div>
+                        @*<div class="row">
+                            <div class="form-group col">
+                                <label for="adress">Address<i style="color: red;">*</i></label>
+                                <input name="address" id="adress" class="form-control" required>
+                            </div>
+                            <div class="form-group col">
+                                <label for="pincode">Pincode<i style="color: red;">*</i></label>
+                                <input name="pincode" id="pincode" class="form-control" required pattern="[0-9]{6}" title="Enter six digit no">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col">
+                                <label for="city">City<i style="color: red;">*</i></label>
+                                <input name="city" type="text" id="city" class="form-control" pattern="[A-Z][a-z]{1,30}" title="Should be letters" required>
+                            </div>
+                        </div>*@
+                        <div>
+                            <button class="btn btn-success" style="font-size: large;" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+
+
+
+  
+</body>
+</html>

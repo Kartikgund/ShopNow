@@ -1,0 +1,140 @@
+﻿
+@{
+    ViewBag.Title = "AjaxStoreListing";
+}
+
+<h2>AjaxStoreListing</h2>
+
+<div>
+    <h2>Add Store</h2>
+    <div class="form-group">
+        <input type="hidden" id="Storeid" />
+    </div>
+    <div class="form-group">
+        Store Name <input type="text" id="StoreName" />
+    </div>
+
+    <div class="form-group">
+        Address <input type="text" id="Address" />
+    </div>
+
+    <div class="form-group">
+        City <input type="text" id="City" />
+    </div>
+
+    <div class="form-group">
+        Contact No <input type="text" id="ContactNo" />
+    </div>
+
+    <div class="form-group">
+        Started Date <input type="date" id="startDate" />
+    </div>
+
+    <div class="form-group">
+        Created Date <input type="datetime" id="CreatedDate" />
+    </div>
+
+    <div class="form-group">
+        <button type="button" id="btnSubmit" onclick="SaveStore();">Save</button>
+    </div>
+
+</div>
+
+
+
+<div id="div1">
+
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        ShowData();
+    });
+
+    function ShowData() {
+        $.ajax({
+            url: '@Url.Action("AjaxStoreList", "Store")',
+            success: function (result) {
+                $("#div1").html(result);
+            }
+        });
+    }
+
+    function SaveStore() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveStoreAjax", "Store")',
+            data: '{StoreName: ' + JSON.stringify($('#StoreName').val()) +
+                ',Address: ' + JSON.stringify($('#Address').val()) +
+                ',City: ' + JSON.stringify($('#City').val()) +
+                ',ContactNo: ' + JSON.stringify($('#ContactNo').val()) +
+                ',Id: ' + JSON.stringify($('#Storeid').val()) +
+                ',StartedDate: ' + JSON.stringify($('#startDate').val()) +
+                ',CreatedDate: ' + JSON.stringify($('#CreatedDate').val()) +'}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                $('#StoreName').val("");
+                $('#Address').val("");
+                $('#City').val("");
+                $('#ContactNo').val("");
+                $('#startDate').val("");
+                $('#CreatedDate').val("");
+                alert("data saved successfully");
+                ShowData();
+
+            },
+            error: function (result) {
+                alert(result);
+            }
+        });
+    }
+
+    function GetStore(id) {
+        alert(id);
+        $("#Storeid").val(id);
+        $.ajax({
+            type:"POST",
+            url: '@Url.Action("GetStoreById","Store")',
+            data: '{Id: ' + JSON.stringify($("#Storeid").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+            success: function (result) {
+                console.log(result);
+                $('#StoreName').val(result.StoreName);
+                $('#Address').val(result.Address);
+                $('#City').val(result.City);
+                $('#ContactNo').val(result.ContactNo);
+                $('#startDate').val(result.StartedDate);
+                $('#CreatedDate').val(result.CreatedDate);
+                ShowData();
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+    }
+
+    function DeleteStore(id) {
+        if (confirm('Are you sure you want to delete this?')) {
+            //alert(id);
+            $("#Storeid").val(id);
+            $.ajax({
+            type:"POST",
+            url: '@Url.Action("DeleteStore","Store")',
+            data: '{Id: ' + JSON.stringify($("#Storeid").val()) + '}',
+            contentType: 'application/json; charset=utf-8',
+            dataType:'json',
+            success: function (result) {
+                console.log(result);
+                alert(id + " deleted successfully");
+                ShowData();
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+        }
+    }
+</script>
