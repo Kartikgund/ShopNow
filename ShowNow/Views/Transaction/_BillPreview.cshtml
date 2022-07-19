@@ -17,7 +17,7 @@
         @Model.objCustmore.CustomerName
     </div>
     <div class="form-group">
-        <label class="control-label col-sm-2" for="NobileNo">Mobile No  :</label>
+        <label class="control-label col-sm-2" for="MobileNo">Mobile No  :</label>
         @Model.objCustmore.MobileNo
     </div>
 </div>
@@ -43,22 +43,23 @@
 </table>
 <br />
 <div class="form-group">
-    <label class="control-label col-sm-2" for="NobileNo">Total Discount  :</label>
+    <label class="control-label col-sm-2" for="TotalDiscount">Total Discount  :</label>
     @Model.objTransaction.TotalDiscount
 </div>
 <div class="form-group">
-    <label class="control-label col-sm-2" for="NobileNo">Total GST  :</label>
+    <label class="control-label col-sm-2" for="TotalGST">Total GST  :</label>
     @Model.objTransaction.GST
 </div>
 
 
 <div class="form-group">
-    <label class="control-label col-sm-2" for="NobileNo">Total Amount  :</label>
+    <label class="control-label col-sm-2" for="TotalAmount">Total Amount  :</label>
     @Model.objTransaction.InvoiceAmount
 </div>
 
 
 @if (string.IsNullOrEmpty(Convert.ToString(ViewBag.Hide)))
 {
-        <a href=@Url.Action("PrintInvoice", "Transaction", new { InvoiceNo = Model.objTransaction.InvoiceNo })>Print</a>
+
+        <a href=@Url.Action("PrintInvoice", "Transaction", new { @InvoiceNo = Model.objTransaction.InvoiceNo,@receiver=ViewBag.receiver })>Print</a>
 }

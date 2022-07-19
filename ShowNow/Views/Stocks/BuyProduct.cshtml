@@ -108,6 +108,10 @@
                     <button type="button" onclick="GetCustomer();" class="btn btn-default">Verify Customer</button>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="MobileNo">Customer Email:</label>
+                <input type="text" id="txtEmail" class="form-control" />
+            </div>
         </div>
     </div>
 
@@ -345,7 +349,8 @@
        $.ajax({
             type:"POST",
            url: '@Url.Action("BillPreview", "Transaction")',
-           data: '{InvoiceNo: ' + JSON.stringify(InvoiceNo) + '}',
+           data: '{InvoiceNo: ' + JSON.stringify(InvoiceNo) +
+               ',receiver: ' + JSON.stringify($('#txtEmail').val()) +'}',
             contentType: 'application/json; charset=utf-8',
             dataType:'html',
            success: function (result) {

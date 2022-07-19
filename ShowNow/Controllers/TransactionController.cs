@@ -8,6 +8,9 @@ using ShopNowBL.Repository;
 using ShowNow.ViewModels;
 using Rotativa;
 using System.IO;
+using System.Net.Mail;
+using System.Net;
+
 
 namespace ShowNow.Controllers
 {
@@ -106,7 +109,7 @@ namespace ShowNow.Controllers
             return RedirectToAction("TransactionPage");
         }
 
-        public ActionResult BillPreview(string InvoiceNo,string hide)
+        public ActionResult BillPreview(string InvoiceNo,string hide, string receiver)
         {
             //InvoiceNo = "6cae7dcfd0e4607b";
             TransactionModel transactionModel = new TransactionModel();
@@ -115,13 +118,13 @@ namespace ShowNow.Controllers
             transactionModel.objTransaction = TR.GetTransactionByInvoiceNo(InvoiceNo);
             transactionModel.objCustmore = CR.getCustomerById(transactionModel.objTransaction.CustomerId);
 
-            ViewBag.InvoiceId = InvoiceNo;
+            ViewBag.receiver = receiver;
             ViewBag.Hide = hide;
 
             return PartialView("_BillPreview",transactionModel);
         }
 
-        public ActionResult PrintInvoice(string InvoiceNo)
+        public ActionResult PrintInvoice(string InvoiceNo,string receiver)
         {
             var a = new ViewAsPdf();
             a.ViewName = "_BillPreview";
@@ -144,7 +147,42 @@ namespace ShowNow.Controllers
 
             // return ActionResult
             MemoryStream ms = new MemoryStream(pdfBytes);
-            return new FileStreamResult(ms, "application/pdf");
+
+            
+            //Email sending
+            try
+            {
+                var senderEmail = new MailAddress("kartikgund2@gmail.com", "Kartik");
+                var receiverEmail = new MailAddress(receiver, "Receiver");
+                var password = "rgpljlpevjrezdpq";
+                var sub = "Invoice For Your Purchase";
+                var body = "Dear "+ transactionModel.objCustmore.CustomerName+ " Thank you for your purchase your Invoice is here, Visit Again!!";
+
+                MailMessage message = new MailMessage();
+                message.To.Add(receiver);// Email-ID of Receiver  
+                message.Subject = sub;// Subject of Email  
+                message.From = senderEmail;// Email-ID of Sender  
+                message.IsBodyHtml = true;
+                Attachment data = new Attachment(ms, fileName, "application/pdf");
+                message.Attachments.Add(data);
+                message.Body = body;
+                SmtpClient SmtpMail = new SmtpClient();
+
+                SmtpMail.Host = "smtp.gmail.com";
+                SmtpMail.Port = 587;
+                SmtpMail.EnableSsl = true;
+                SmtpMail.DeliveryMethod = SmtpDeliveryMethod.Network;
+                SmtpMail.UseDefaultCredentials = false;
+                SmtpMail.Credentials = new NetworkCredential(senderEmail.Address, password);
+                SmtpMail.Send(message);
+                
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Some Error";
+            }
+
+            return RedirectToAction("BuyProduct", "Stocks");
         }
     }
 }
