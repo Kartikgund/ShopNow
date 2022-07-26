@@ -18,6 +18,7 @@ namespace ShopNowBL.Models
         public virtual DbSet<tblTransaction> tblTransactions { get; set; }
         public virtual DbSet<tblTransactionItem> tblTransactionItems { get; set; }
         public virtual DbSet<tblUser> tblUsers { get; set; }
+        public virtual DbSet<tblOTP> tblOTPs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

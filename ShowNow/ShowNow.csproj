@@ -128,6 +128,7 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\MyActionFilter.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="ViewModels\StoreAndStock.cs" />
     <Compile Include="ViewModels\TransactionModel.cs" />
     <Compile Include="ViewModels\UserAndCustomer.cs" />
+    <Compile Include="ViewModels\UserAndStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -184,7 +186,6 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Home\Register.cshtml" />
     <Content Include="Views\Customer\ListCustomer.cshtml" />
     <Content Include="Views\Customer\AddCustomer.cshtml" />
@@ -208,6 +209,9 @@
     <Content Include="Views\Stocks\_SelectedProduct.cshtml" />
     <Content Include="Views\Transaction\TransactionPage.cshtml" />
     <Content Include="Views\Transaction\_BillPreview.cshtml" />
+    <Content Include="Views\User\ForgetPassword.cshtml" />
+    <Content Include="Views\User\_ResetPassword.cshtml" />
+    <Content Include="Views\User\RegisterUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

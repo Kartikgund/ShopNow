@@ -1,0 +1,90 @@
+﻿@model ShowNow.ViewModels.UserAndStore
+
+@{
+    ViewBag.Title = "RegisterUser";
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ForgetPassword</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <h2 >Register User</h2>
+
+    @using (Html.BeginForm("SaveUser", "User", FormMethod.Post))
+    {
+
+        <div class="form-horizontal">
+
+            <hr />
+            @Html.HiddenFor(model => model.objUser.Id)
+            <div class="form-group">
+                @Html.Label("UserName", "User Name", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.objUser.UserName, new { htmlAttributes = new { @class = "form-control", pattern = @"(?=.*[a-zA-Z][a-zA-Z]).{2,}", @required = "required" } })
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("EmailId", "Email Id", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.objUser.EmailId, new { htmlAttributes = new { @class = "form-control",type="Email" , @required = "required" } })
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("MobileNo", "Mobile No", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.objUser.MobileNo, new { htmlAttributes = new { @class = "form-control", pattern = @"^!*(\d!*){10,}$", @required = "required" } })
+
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                @Html.Label("Password", "Password", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.objUser.Password, new { htmlAttributes = new { @class = "form-control", type = "Password", pattern = @"(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}", @required = "required" } })
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("City", "City", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.objUser.City, new { htmlAttributes = new { @class = "form-control", pattern = @"(?=.*[a-zA-Z][a-zA-Z]).{2,}", @required ="required" } })
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("StoreId", "Store Id", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.objUser.StoreId, new SelectList(Model.lstStore, "Id", "StoreName"), "Please Select",
+        new { @id = "store", @class = "form-control" })
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-success" />
+                </div>
+            </div>
+        </div>
+    }
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>
+
+

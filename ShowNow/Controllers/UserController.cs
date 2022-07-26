@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using ShopNowBL.Models;
@@ -13,6 +15,8 @@ namespace ShowNow.Controllers
     {
         UserRepo repo= new UserRepo();
         CustomerRepo CR = new CustomerRepo();
+        StoreRepo SR = new StoreRepo();
+        
         // GET: User
         public ActionResult Index()
         {
@@ -24,9 +28,36 @@ namespace ShowNow.Controllers
             return View();
         }
 
+        public ActionResult RegisterUser()
+        {
+            UserAndStore userAndStore = new UserAndStore();
+            userAndStore.lstStore = SR.GetAllStores();
+            return View(userAndStore);
+        }
+
+        [HttpPost]
+        public ActionResult SaveUser(UserAndStore userAndStore)
+        {
+            tblUser objAdmin = userAndStore.objUser;
+            objAdmin.CreatedDate = DateTime.Now;
+            objAdmin.CreatedBy = 1;
+            objAdmin.RoleId = 2;
+            objAdmin.Password = repo.encrypt(objAdmin.Password);
+            bool result = repo.AddUser(objAdmin);
+            if (result == true)
+            {
+                return RedirectToAction("Login", "User");
+            }
+            else
+            {
+                return RedirectToAction("RegisterUser");
+            }
+
+        }
         public ActionResult AuthenticateUser(tblUser objUser)
         {
-            var user = repo.ValidateUser(objUser.EmailId, objUser.Password);
+            string pass = repo.encrypt(objUser.Password);
+            var user = repo.ValidateUser(objUser.EmailId, pass);
             if(user!=null)
             {
                 Session["User"] = user;
@@ -40,11 +71,111 @@ namespace ShowNow.Controllers
             
         }
 
+        public ActionResult ForgetPassword()
+        {
+            return View();
+        }
+
+        public ActionResult VerifyEmail(string email)
+        {
+            tblUser user = repo.VerifyEmail(email);
+           
+            bool result=false;
+            if (user != null)
+            {
+                tblOTP objOtp = new tblOTP();
+                Random r = new Random();
+                int genRand = r.Next(100000, 999999);
+                objOtp.EmailId = user.EmailId;
+                objOtp.OTP = genRand;
+                objOtp.IsUsed = 0;
+                objOtp.Created_DateTime = DateTime.Now;
+                result = repo.AddOtpToDb(objOtp);
+
+                if (result)
+                {
+                    try
+                    {
+                        var senderEmail = new MailAddress("kartikgund2@gmail.com", "Kartik");
+                        var receiverEmail = new MailAddress(user.EmailId, "Receiver");
+                        var password = "rgpljlpevjrezdpq";
+                        var sub = "OTP for Reset Password";
+                        var body = "Dear " + user.UserName +  " <b>" + genRand + "</b> is your One-Time-Password. It is valid for 10 mins.";
+
+                        MailMessage message = new MailMessage();
+                        message.To.Add(user.EmailId);// Email-ID of Receiver  
+                        message.Subject = sub;// Subject of Email  
+                        message.From = senderEmail;// Email-ID of Sender  
+                        message.IsBodyHtml = true;
+                       
+                        message.Body = body;
+                        SmtpClient SmtpMail = new SmtpClient();
+
+                        SmtpMail.Host = "smtp.gmail.com";
+                        SmtpMail.Port = 587;
+                        SmtpMail.EnableSsl = true;
+                        SmtpMail.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        SmtpMail.UseDefaultCredentials = false;
+                        SmtpMail.Credentials = new NetworkCredential(senderEmail.Address, password);
+                        SmtpMail.Send(message);
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+            }
+             return Json(user, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult VerifyOTP(string email,string otp)
+        {
+            tblOTP objotp = repo.GetObjOtpByEmail(email);
+            string result = "OTP is Used,Generate another OTP";
+
+            TimeSpan ts = DateTime.Now - objotp.Created_DateTime;
+         //   int time = Convert.ToInt32(ts);
+            if (ts.Minutes <= 10)
+            {
+                 if (objotp.OTP == Convert.ToInt32(otp))
+                 {
+                    objotp.IsUsed = 1;
+                    repo.AddOtpToDb(objotp);
+                    result = "Valid OTP";
+                 }
+            }
+            else
+            {
+                result = "OTP expired";
+            }
+
+           
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ResetPassword(string email)
+        {
+            tblUser objUser = repo.VerifyEmail(email);
+            ViewBag.EmailId = objUser.EmailId;
+            return PartialView("_ResetPassword");
+        }
+
+        public ActionResult SavePassword(string email,string password1)
+        {
+            tblUser objUser = repo.VerifyEmail(email);
+           
+            objUser.Password = repo.encrypt(password1);
+            repo.AddUser(objUser);
+            return RedirectToAction("Login");
+        }
         public ActionResult Logout()
         {
             Session["User"] = null;
             return RedirectToAction("Login");
         }
+
 
         public ActionResult AdminList()
         {
@@ -62,7 +193,11 @@ namespace ShowNow.Controllers
         [HttpPost]
         public ActionResult SaveAdmin(tblUser objAdmin)
         {
-            bool result = repo.AddAdmin(objAdmin);
+            objAdmin.CreatedDate = DateTime.Now;
+            objAdmin.CreatedBy = 1;
+            objAdmin.RoleId = 2;
+            objAdmin.Password = repo.encrypt(objAdmin.Password);
+            bool result = repo.AddUser(objAdmin);
             if (result == true)
             {
                 return RedirectToAction("Index", "Home");
@@ -77,9 +212,11 @@ namespace ShowNow.Controllers
         public ActionResult AdminDetails(int id)
         {
             var objAdmin = repo.GetUserDetails(id);
+            objAdmin.Password = repo.Decrypt(objAdmin.Password);
             return View("AddAdmin", objAdmin);
         }
 
+        //List cashier
         public ActionResult AdminLogin()
         {
             var cashiers = repo.GetAllCashiers();
@@ -96,7 +233,10 @@ namespace ShowNow.Controllers
         [HttpPost]
         public ActionResult SaveCashier(tblUser objCashier)
         {
-            bool result = repo.AddCashier(objCashier);
+            objCashier.CreatedBy = 2;
+            objCashier.CreatedDate = DateTime.Now;
+            objCashier.RoleId = 3;
+            bool result = repo.AddUser(objCashier);
             if (result == true)
             {
                 return RedirectToAction("AdminList");
@@ -108,7 +248,7 @@ namespace ShowNow.Controllers
 
         }
 
-        //Delete Cashier
+       
         public ActionResult DeleteAdmin(int id)
         {
             var result = repo.DeleteUserById(id);
@@ -171,6 +311,8 @@ namespace ShowNow.Controllers
             user.City = city;
             user.StoreId = storeId;
             user.RoleId = RoleId;
+            user.CreatedDate = DateTime.Now;
+            user.CreatedBy = 1;
             var result = repo.AddUser(user);
             return Json(result, JsonRequestBehavior.AllowGet);
         }

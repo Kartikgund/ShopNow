@@ -6,11 +6,27 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using ShopNowBL.Models;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace ShopNowBL.Repository
 {
     public class UserRepo
     {
+        //save user
+        public bool AddUser(tblUser user)
+        {
+            bool Result = false;
+            using (DPTContext context = new DPTContext())
+            {
+                context.tblUsers.AddOrUpdate(user);
+                context.SaveChanges();
+                Result = true;
+            }
+
+            return Result;
+        }
+
         public List<tblUser> GetAllUsers()
         {
 
@@ -26,7 +42,6 @@ namespace ShopNowBL.Repository
 
         public List<tblUser> GetAllAdmin()
         {
-
             List<tblUser> lstAdmin = new List<tblUser>();
             using (DPTContext context = new DPTContext())
             {
@@ -35,42 +50,6 @@ namespace ShopNowBL.Repository
                  return lstAdmin;
             }
 
-        }
-        //Add Admin
-        public bool AddAdmin(tblUser user)
-        {
-            bool Result = false;
-            using (DPTContext context = new DPTContext())
-            {
-                try
-                {
-                    user.RoleId = 2;
-                    user.CreatedDate = DateTime.Now;
-                    user.CreatedBy = 1;
-                    context.tblUsers.AddOrUpdate(user);
-                    context.SaveChanges();
-                    Result = true;
-                }
-
-                catch (Exception ex)
-                {
-
-                    throw ex;
-                }
-            }
-
-            return Result;
-        }
-
-        //Admin Login
-        public tblUser ValidateUser(string emailId, string password)
-        {
-            tblUser objUser = new tblUser();
-            using (DPTContext context = new DPTContext())
-            {
-                objUser = context.tblUsers.Where(x => x.EmailId == emailId && x.Password == password).FirstOrDefault();
-            }
-            return objUser;
         }
 
         public List<tblUser> GetAllCashiers()
@@ -81,9 +60,6 @@ namespace ShopNowBL.Repository
             {
                 try
                 {
-                    /*lstCashiers = (from tblUser in context.tblUsers
-                                    where tblUser.RoleId == 3 
-                                    select tblUser).ToList();*/
                     lstCashiers = context.tblUsers.Where(x => x.RoleId == 3).ToList();
 
                     return lstCashiers;
@@ -97,22 +73,43 @@ namespace ShopNowBL.Repository
 
         }
 
-        public bool AddCashier(tblUser user)
+        //Admin Login
+        public tblUser ValidateUser(string emailId, string password)
         {
-            bool Result = false;
+            tblUser objUser = new tblUser();
             using (DPTContext context = new DPTContext())
             {
-                user.RoleId = 3;
-                user.CreatedDate = DateTime.Now;
-                user.CreatedBy = 2;
-                context.tblUsers.AddOrUpdate(user);
+                objUser = context.tblUsers.Where(x => x.EmailId == emailId && x.Password == password).FirstOrDefault();
+            }
+            return objUser;
+        }
+
+        //get user by email
+        public tblUser VerifyEmail(string email)
+        {
+            tblUser objUser = new tblUser();
+            using (DPTContext context = new DPTContext())
+            {
+                objUser = context.tblUsers.Where(x => x.EmailId == email).FirstOrDefault();
+            }
+            return objUser;
+        }
+
+        //add otp obj to db
+        public bool AddOtpToDb(tblOTP objOtp)
+        {
+            bool result = false;
+            using (DPTContext context = new DPTContext())
+            {
+                context.tblOTPs.AddOrUpdate(objOtp);
                 context.SaveChanges();
-                Result = true;
+                result = true;
             }
 
-            return Result;
+            return result;
+            
         }
-        
+
         public bool DeleteUserById(int id)
         {
             bool result = false;
@@ -125,6 +122,17 @@ namespace ShopNowBL.Repository
             }
                 
             return result;
+        }
+
+        public tblOTP GetObjOtpByEmail(string email)
+        {
+            tblOTP objOtp = new tblOTP();
+            using (DPTContext context = new DPTContext())
+            {
+                objOtp = context.tblOTPs.Where(x => x.EmailId == email && x.IsUsed == 0)
+                    .OrderByDescending(t => t.Created_DateTime).FirstOrDefault();
+            }
+            return objOtp;
         }
 
         public tblUser GetUserDetails(int id)
@@ -140,20 +148,49 @@ namespace ShopNowBL.Repository
             return objCashier;
         }
 
-        public bool AddUser(tblUser user)
+        //******************Encrypt Password********************************** 
+        public string encrypt(string clearText)
         {
-            bool Result = false;
-            using (DPTContext context = new DPTContext())
+            string EncryptionKey = "MAKV2SPBNI99212";
+            byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
+            using (Aes encryptor = Aes.Create())
             {
-               // user.RoleId = 2;
-                user.CreatedDate = DateTime.Now;
-                user.CreatedBy = 2;
-                context.tblUsers.AddOrUpdate(user);
-                context.SaveChanges();
-                Result = true;
+                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(clearBytes, 0, clearBytes.Length);
+                        cs.Close();
+                    }
+                    clearText = Convert.ToBase64String(ms.ToArray());
+                }
             }
+            return clearText;
+        }
 
-            return Result;
+        public string Decrypt(string cipherText)
+        {
+            string EncryptionKey = "MAKV2SPBNI99212";
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+            using (Aes encryptor = Aes.Create())
+            {
+                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(cipherBytes, 0, cipherBytes.Length);
+                        cs.Close();
+                    }
+                    cipherText = Encoding.Unicode.GetString(ms.ToArray());
+                }
+            }
+            return cipherText;
         }
     }
 }
